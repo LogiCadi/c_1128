@@ -6,16 +6,20 @@ cc.Class({
     },
 
     // LIFE-CYCLE CALLBACKS:
-
+   
     onLoad() {
-
-        
+        this.dataStore = cc.find('Game').getComponent('DataStore')
         this.ani()
-
-
     },
 
-    // 两针的动画
+    init() {
+        // 创建后的目标是找桌子
+        this.target = 'table'
+        this.node.setPosition(cc.v2(200, 700))
+        this.node.runAction(cc.moveTo(3, cc.v2(200, 400)))
+    },
+
+    // 两帧的动画
     ani() {
         var self = this
         var people = []
@@ -25,10 +29,12 @@ cc.Class({
                 people.push(spriteFrame)
 
                 let index = 0
+                self.node.getComponent(cc.Sprite).spriteFrame = people[index++]
+                if (index >= people.length) index = 0
                 self.schedule(function () {
-                    self.node.getComponent(cc.Sprite).spriteFrame = people[index]
-                    if (++index >= people.length) index = 0
-                }, 1);
+                    self.node.getComponent(cc.Sprite).spriteFrame = people[index++]
+                    if (index >= people.length) index = 0
+                }, 0.5);
             });
         });
     },
@@ -36,6 +42,24 @@ cc.Class({
     start() {
 
     },
+    /**找桌子 */
+    findTable() {
+        let tableIndex = this.dataStore.getBlankTable()
+        if (tableIndex !== false) {
+            this.target = 'food'
+            this.dataStore.tableData[tableIndex].hasPeople = true
+            this.node.stopAllActions()
+            let x = this.dataStore.tableData[tableIndex].x
+            let y = this.dataStore.tableData[tableIndex].y
 
-    // update (dt) {},
+            this.node.runAction(cc.moveTo(5, cc.v2(x, y + 100)))
+        }
+    },
+    
+
+    update (dt) {
+        if (this.target == 'table') {
+            this.findTable()
+        }
+    },
 });
