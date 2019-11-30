@@ -21,20 +21,24 @@ cc.Class({
 
     onLoad() {
         this.dataStore = cc.find('Game').getComponent('DataStore')
+        this.game = cc.find('Game').getComponent('Game')
+
         this.node.active = false
         this.loadData()
+    },
+    start() {
+
     },
 
     loadData() {
         // 加载列表
         for (let index = 0; index < 10; index++) {
             let item = cc.instantiate(this.item)
+            this.content.addChild(item)
             item.on(cc.Node.EventType.TOUCH_START, function (e) {
-
-                this.map.getChildByName('scene_1').getComponent('Scene_1').newMenuItem()
+                this.game.newMenuItem()
                 this.closeModal()
             }, this)
-            this.content.addChild(item)
         }
     },
 

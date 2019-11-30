@@ -11,7 +11,11 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
+        this.dataStore = cc.find('Game').getComponent('DataStore')
+
         this.registerTouch()
+
+        cc.director.getPhysicsManager().enabled = true
     },
 
     start() {
@@ -30,6 +34,9 @@ cc.Class({
         let startX
         this.node.on(cc.Node.EventType.TOUCH_START, function (e) {
             startX = e.getLocation().x
+
+            this.dataStore.x = this.node.convertToNodeSpaceAR(e.getLocation()).x
+            this.dataStore.y = this.node.convertToNodeSpaceAR(e.getLocation()).y
         }, this)
 
         this.node.on(cc.Node.EventType.TOUCH_END, function (e) {
