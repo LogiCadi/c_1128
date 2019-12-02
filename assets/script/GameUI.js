@@ -37,6 +37,8 @@ cc.Class({
 
             this.dataStore.x = this.node.convertToNodeSpaceAR(e.getLocation()).x
             this.dataStore.y = this.node.convertToNodeSpaceAR(e.getLocation()).y
+
+            
         }, this)
 
         this.node.on(cc.Node.EventType.TOUCH_END, function (e) {

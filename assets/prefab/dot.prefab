@@ -12,7 +12,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "people",
+    "_name": "dot",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -21,36 +21,33 @@
     "_components": [
       {
         "__id__": 2
-      },
-      {
-        "__id__": 3
       }
     ],
     "_prefab": {
-      "__id__": 4
+      "__id__": 3
     },
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
-      "b": 255,
+      "r": 192,
+      "g": 0,
+      "b": 0,
       "a": 255
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 65,
-      "height": 150
+      "width": 4,
+      "height": 4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 0.5000000000000016,
-      "y": 0
+      "x": 0.5,
+      "y": 0.5
     },
     "_position": {
       "__type__": "cc.Vec3",
-      "x": 0,
-      "y": 0,
+      "x": 384,
+      "y": 638,
       "z": 0
     },
     "_scale": {
@@ -74,19 +71,6 @@
     "_id": ""
   },
   {
-    "__type__": "6080bzGld9CYp8u/n4eb/cx",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "dot": {
-      "__uuid__": "3024ac56-df97-472e-aa5f-d2ef491384b9"
-    },
-    "_id": ""
-  },
-  {
     "__type__": "cc.Sprite",
     "_name": "",
     "_objFlags": 0,
@@ -94,7 +78,9 @@
       "__id__": 1
     },
     "_enabled": true,
-    "_spriteFrame": null,
+    "_spriteFrame": {
+      "__uuid__": "a23235d1-15db-4b95-8439-a2e005bfff91"
+    },
     "_type": 0,
     "_sizeMode": 0,
     "_fillType": 0,
@@ -118,9 +104,9 @@
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "b9887b41-70c1-47b3-91a7-83d823e1360e"
+      "__id__": 0
     },
-    "fileId": "037BCIqtxHm5A45uJYeYE0",
+    "fileId": "d4QE+xtNZCArTAFBy30Ycj",
     "sync": false
   }
 ]
