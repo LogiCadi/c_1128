@@ -10,11 +10,6 @@ cc.Class({
             default: null,
             type: cc.Node
         },
-        map: {
-            default: null,
-            type: cc.Node
-        },
-
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -23,7 +18,7 @@ cc.Class({
         this.dataStore = cc.find('Game').getComponent('DataStore')
         this.game = cc.find('Game').getComponent('Game')
 
-        this.node.active = false
+        this.node.getComponent(cc.Animation).play()
         this.loadData()
     },
     start() {
@@ -32,7 +27,7 @@ cc.Class({
 
     loadData() {
         // 加载列表
-        for (let index = 0; index < 10; index++) {
+        for (let index = 0; index < 100; index++) {
             let item = cc.instantiate(this.item)
             this.content.addChild(item)
             item.on(cc.Node.EventType.TOUCH_START, function (e) {
@@ -42,13 +37,9 @@ cc.Class({
         }
     },
 
-    showModal(e) {
-        this.node.active = true
-        this.node.getComponent(cc.Animation).play()
-    },
-
+    /**关闭modal */
     closeModal() {
-        this.node.active = false
+        this.node.destroy()
     },
     start() {
 

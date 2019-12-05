@@ -17,16 +17,15 @@ cc.Class({
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {},
+    onLoad () {
+    },
 
     start () {
-
+        this.node.getChildByName('food').active = false
     },
 
     update (dt) {
         this.node.zIndex = 1000 - this.node.y
-
-        // this.node.getBoundingBoxToWorld().contains(cc.v2())
     },
     
 });
