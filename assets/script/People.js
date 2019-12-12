@@ -17,27 +17,15 @@ cc.Class({
 
     init() {
         // 选定一个角色
-        this.characterIndex = this.dataStore.getRandom(1, 3)
+        this.peopleData = this.dataStore.getPeople()
 
         // 创建后的目标是找桌子
         this.target = 'table'
         // 点菜隐藏
         this.node.getChildByName('bubble').active = false
-        this.node.setPosition(cc.v2(200, 600)) // 初始点
-
-        // 点菜排队
-        let queue = this.dataStore.queue.table
-        let latest = queue.list[queue.list.length - 1]
-        if (latest) {
-            this.node.q_x = latest.q_x + queue.a_x
-            this.node.q_y = latest.q_y + queue.a_y
-        } else {
-            this.node.q_x = queue.x
-            this.node.q_y = queue.y
-        }
-
-        queue.list.push(this.node)
-        this.moveTo(this.node.q_x, this.node.q_y)
+        let initX = 200 + this.dataStore.getRandom(-1, 1) * 10
+        this.node.setPosition(cc.v2(initX, this.game.canvas.height / 2 + this.node.height)) // 初始点
+        // this.dataStore.queue.table.list.push(this.node)
 
         this.ani()
     },
@@ -45,9 +33,10 @@ cc.Class({
     // 两帧的动画
     ani() {
         let imgAni = [
-            this.dataStore.imageRes[`people_${this.characterIndex}_1`],
-            this.dataStore.imageRes[`people_${this.characterIndex}_2`],
+            this.dataStore.imageList[this.peopleData['ID']],
+            this.dataStore.imageList[this.peopleData['ID'] + '-1'],
         ]
+
         let index = 0
         this.node.getComponent(cc.Sprite).spriteFrame = imgAni[index++]
         if (index >= imgAni.length) index = 0
@@ -60,17 +49,20 @@ cc.Class({
     start() {},
 
     // 人物移动到指定位置
-    moveTo(x, y, callBack) {
+    moveTo(x, y, callBack, step = 100) {
+        // let step = 100 // 寻路像素密度，越大精度越差，但性能越好
+
+        // 防止重复指定路径
         if (this.targetPosX == x && this.targetPosY == y) return
         this.targetPosX = x
         this.targetPosY = y
-
-        let step = 100 // 寻路像素密度，越大精度越差，但性能越好
 
         let target = {
             x: Math.round(x / step) * step,
             y: Math.round(y / step) * step,
         }
+
+        // console.log(this.target)
 
         let current = {
             x: Math.round(this.node.x / step) * step,
@@ -78,7 +70,7 @@ cc.Class({
         }
 
         if (target.x == current.x && target.y == current.y) return
-
+        if (this.dataStore.getBarrier(target)) return
         let time = Date.now()
         // ===============A* 寻路
 
@@ -212,13 +204,14 @@ cc.Class({
 
             if (isInList(target, openList)) {
                 go = false
-                console.log('已找到路径')
+                // console.log('已找到路径')
             } else if (openList.length === 0) {
                 go = false
-                console.log('未找到路径')
+                // console.log('未找到路径')
             }
+            // console.log('寻路')
         }
-        console.log('寻路消耗', Date.now() - time + 'ms')
+        // console.log('寻路消耗', Date.now() - time + 'ms')
 
         // console.log('openList', openList)
         // console.log('closeList', closeList)
@@ -235,7 +228,7 @@ cc.Class({
             })
             // 描绘路径点
             // let dot = cc.instantiate(this.dot)
-            // this.game.map.getChildByName('scene_1').addChild(dot)
+            // this.game.map.getChildByName('canting').addChild(dot)
             // dot.setPosition(cc.v2(drawPoint.x, drawPoint.y))
 
             let p_x = drawPoint.p_x
@@ -254,15 +247,36 @@ cc.Class({
             x: target.x,
             y: target.y
         })
+        // // ===== 路径生成完毕
+
+        // // 检查位置被占用
+        // while (true) {
+        //     if (pathList.length == 0) return
+        //     // if (this.targetPosX != pathList[pathList.length - 1].x || this.targetPosY != pathList[pathList.length - 1].y) {
+
+        //     // }
+        //     if (this.dataStore.peoplePosition[pathList[pathList.length - 1].x + '-' + pathList[pathList.length - 1].y]) {
+        //         // 被占用
+        //         pathList.pop()
+        //     } else {
+        //         break
+        //     }
+        // }
+        // // console.log(pathList)
+
+        // // 放开当前坐标
+        // this.dataStore.peoplePosition[current.x + '-' + current.y] = false
+        // // 关闭终点坐标
+        // this.dataStore.peoplePosition[pathList[pathList.length - 1].x + '-' + pathList[pathList.length - 1].y] = true
 
         let moveActionList = []
-        let speedFactor = 8 // 速度系数
-        let speed
+        let speed = 100 // 速度
+        let distance
         for (let i = 0; i < pathList.length; i++) {
             if (i != 0 && (pathList[i].x == pathList[i - 1].x || pathList[i].y == pathList[i - 1].y)) {
-                speed = 14 * speedFactor // 走直线
+                distance = 1.0 * step // 走直线
             } else {
-                speed = 10 * speedFactor // 走斜线 速度要慢一点
+                distance = 1.4 * step // 走斜线 
             }
 
             if (i != 0 && pathList[i].x > pathList[i - 1].x) {
@@ -273,10 +287,10 @@ cc.Class({
                 moveActionList.push(cc.flipX(false))
             }
 
-            moveActionList.push(cc.moveTo(step / speed, cc.v2(pathList[i].x, pathList[i].y)))
+            moveActionList.push(cc.moveTo(distance / speed, cc.v2(pathList[i].x, pathList[i].y)))
         }
         // 移动到正确的终点
-        moveActionList.push(cc.moveTo(step / speed / 5, cc.v2(x, y)))
+        // moveActionList.push(cc.moveTo(step / speed / 5, cc.v2(x, y)))
 
         if (callBack) {
             // 动作完成后
@@ -285,33 +299,112 @@ cc.Class({
         }
 
         this.node.stopAllActions()
-        this.node.runAction(cc.sequence(...moveActionList))
+        if (moveActionList.length > 1) {
+            this.node.runAction(cc.sequence(...moveActionList))
+        } else {
+            this.node.runAction(...moveActionList)
+        }
+    },
+    /**随机走动 */
+    randomWalk(times, callBack) {
+        let isBlock = true
+        let x, y
+        while (isBlock) {
+            x = this.dataStore.getRandom(-this.game.canvas.width / 2, this.game.canvas.width / 2)
+            y = this.dataStore.getRandom(-this.game.canvas.height / 2, this.game.canvas.height / 2)
+            isBlock = this.dataStore.getBarrier({
+                x,
+                y
+            })
+        }
+
+        this.moveTo(x, y, () => {
+            this.scheduleOnce(function () {
+                if (--times > 0) {
+                    this.randomWalk(times, callBack)
+                } else {
+                    callBack()
+                }
+            }, 3)
+        })
+    },
+
+    /**去吧台 */
+    goBar(barList, times = 0, callBack) {
+        this.moveTo(barList[times].position.x - 100, barList[times].position.y + 100, () => {
+            this.node.runAction(cc.flipX(true))
+
+            this.scheduleOnce(function () {
+                this.game.dropCoin(this.node.x, this.node.y, barList[times].itemList[barList[times].current.itemId]["二次消费"], barList[times]["title"])
+
+                if (++times < barList.length) {
+                    this.goBar(barList, times, callBack)
+                } else {
+                    callBack()
+                }
+            }, 8)
+        })
     },
 
     /**点餐 */
     order() {
-        // 隐藏气泡
-        this.node.getChildByName('bubble').destroy()
-        this.scheduleOnce(function () {
-            // 在桌子上显示食物
-            this.table.node.getChildByName('food').active = true
+        if (this.target == 'order') {
+            if (this.dataStore.dish[this.dish.id]["已解锁"]) {
+                this.dataStore.cookingQueue.push({
+                    table: this.table,
+                    dish: this.dish
+                })
+                // 隐藏气泡
+                this.node.getChildByName('bubble').destroy()
+                // 等待上菜
+                this.target = 'wait'
+            } else {
+                // 没有解锁
+                this.target = 'leave'
+                this.node.getChildByName('bubble').getComponent(cc.Sprite).spriteFrame = this.dataStore.imageList["生气"]
+                this.dataStore.buildData[this.table["id"]]["data"].curPeople = null
+                this.leave()
+            }
 
-            this.scheduleOnce(function () {
-                // 掉小鱼
-                this.game.dropCoin(this.node.x, this.node.y)
+        }
 
-                this.scheduleOnce(function () {
-                    // 吃完了，走人
-                    this.table.node.getChildByName('food').active = false
-                    this.table.hasPeople = false
+        // this.scheduleOnce(function () {
+        //     // 在桌子上显示食物
+        //     this.table.current.node.getChildByName('food').active = true
 
-                    this.moveTo(200, 640, () => {
-                        this.node.runAction(cc.fadeOut(1))
-                    })
-                }, 3)
-            }, 3)
-        }, 3)
+        //     this.scheduleOnce(function () {
+        //         // 掉小鱼
+        //         this.game.dropCoin(this.node.x, this.node.y)
 
+        //         this.scheduleOnce(function () {
+        //             // 吃完le 
+        //             this.table.current.node.getChildByName('food').active = false
+        //             this.table.data.curPeople = false
+
+
+        //             let barList = this.dataStore.getBar()
+        //             if (barList.length > 0) {
+        //                 this.goBar(barList, 0, () => {
+        //                     this.moveTo(200, 600, () => {
+        //                         this.node.destroy()
+        //                     })
+        //                 })
+        //             } else {
+        //                 this.moveTo(200, 600, () => {
+        //                     this.node.destroy()
+        //                 })
+        //             }
+
+        //         }, 3)
+        //     }, 3)
+        // }, 3)
+
+    },
+    // 离开
+    leave() {
+        this.moveTo(200, this.game.canvas.height / 2 + this.node.height, () => {
+            this.node.destroy()
+        })
     },
 
     update(dt) {
@@ -319,27 +412,92 @@ cc.Class({
 
         if (this.target == 'table') {
             // 找桌子
-            let tableIndex = this.dataStore.getBlankTable()
-            if (tableIndex !== false) {
-                // 有桌子
-                this.table = this.dataStore.tableData[tableIndex]
-                // 标记该桌子有人了
-                this.dataStore.tableData[tableIndex].hasPeople = true
-                // 下一个目标点菜
-                this.target = 'food'
-                // 移动到桌子
-                this.moveTo(this.table.x, this.table.y + 100, () => {
-                    // 重置朝向左
-                    this.node.runAction(cc.flipX(false))
-                    this.scheduleOnce(function () {
-                        // 显示客人想吃什么
-                        this.node.getChildByName('bubble').active = true
-                    }, 3)
-                })
+            this.table = this.dataStore.getBlankTable()
+            // console.log(this.table)
+            if (this.table) {
+                if (this.dataStore.peoplePosition.table.length == 0 || this.dataStore.peoplePosition.table[0].uuid == this.node.uuid) {
+                    this.dataStore.peoplePosition.table.shift()
+                    for (const key in this.dataStore.peoplePosition.table) {
+                        // 队列整体往前移
+                        this.dataStore.peoplePosition.table[key].y -= 30
+                    }
+                    // 标记该桌子有人了
+                    this.dataStore.buildData[this.table["id"]]["data"].curPeople = this
+
+                    // 下一个目标点菜
+                    this.target = 'order'
+                    // 移动到桌子
+                    this.moveTo(this.table.position.x, this.table.position.y + 100, () => {
+                        // 重置朝向左
+                        this.node.runAction(cc.flipX(false))
+                        this.scheduleOnce(function () {
+                            // 显示客人想吃什么
+                            this.dish = this.dataStore.getPeopleFood(this.peopleData)
+                            this.node.getChildByName('bubble').active = true
+                            this.node.getChildByName('bubble').getComponent(cc.Sprite).spriteFrame = this.dataStore.imageList[this.dish["id"]]
+                            this.scheduleOnce(function () {
+                                if (this.target == 'order') {
+                                    // 5s没人响应 生气离开
+                                    this.target = 'leave'
+                                    this.node.getChildByName('bubble').getComponent(cc.Sprite).spriteFrame = this.dataStore.imageList["生气"]
+                                    this.dataStore.buildData[this.table["id"]]["data"].curPeople = null
+                                    this.leave()
+                                }
+                            }, 5)
+
+                        }, 3)
+                    })
+                }
             } else {
                 // 排队等候
-                this.moveTo(200, 400)
+                let target
+                for (const value of this.dataStore.peoplePosition.table) {
+                    if (value['uuid'] == this.node.uuid) {
+                        target = value
+                        break
+                    }
+                }
+
+                if (!target) {
+                    // 首次排队
+                    let queuePrev = this.dataStore.peoplePosition.table[this.dataStore.peoplePosition.table.length - 1]
+                    if (queuePrev) {
+                        target = {
+                            uuid: this.node.uuid,
+                            x: this.node.x,
+                            y: queuePrev.y + 30
+                        }
+                    } else {
+                        // 初始位置
+                        target = {
+                            uuid: this.node.uuid,
+                            x: this.node.x,
+                            y: 400
+                        }
+                    }
+                    this.dataStore.peoplePosition.table.push(target)
+                }
+                this.moveTo(target.x, target.y, false, 10)
             }
+
+        }
+        if (this.target == 'bar') {
+            // 吃完了 去找吧台
+            this.target = 'leave'
+            // 掉小鱼
+            this.game.dropCoin(this.node.x, this.node.y, this.dataStore.dish[this.dish.id]["每卖出一份能收入"], this.table.title)
+            // 桌子空闲
+            this.dataStore.buildData[this.table["id"]]["data"].curPeople = null
+
+            let barList = this.dataStore.getBar()
+            if (barList.length > 0) {
+                this.goBar(barList, 0, () => {
+                    this.leave()
+                })
+            } else {
+                this.leave()
+            }
+
         }
     }
 });

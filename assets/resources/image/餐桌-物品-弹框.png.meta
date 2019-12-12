@@ -1,0 +1,31 @@
+{
+  "ver": "2.2.0",
+  "uuid": "0230cb68-e3b6-49ec-98df-60c2b2db9352",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "subMetas": {
+    "餐桌-物品-弹框": {
+      "ver": "1.0.3",
+      "uuid": "02aa272f-f2ad-4e22-819e-df380a8fc1bc",
+      "rawTextureUuid": "0230cb68-e3b6-49ec-98df-60c2b2db9352",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 969,
+      "height": 1006,
+      "rawWidth": 969,
+      "rawHeight": 1006,
+      "borderTop": 97,
+      "borderBottom": 86,
+      "borderLeft": 97,
+      "borderRight": 97,
+      "subMetas": {}
+    }
+  }
+}

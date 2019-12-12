@@ -12,38 +12,33 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-
+      
     },
 
     // LIFE-CYCLE CALLBACKS:
 
-    onLoad() {
+    onLoad () {
+        this.dataStore = cc.find('Game').getComponent('DataStore')
         this.game = cc.find('Game').getComponent('Game')
     },
 
-    start() {
-        this.node.getChildByName('food').active = false
-        this.node.getChildByName('top_food').active = false
-        this.node.getChildByName('bottom_bubble').active = false
+    start () {
+
     },
 
-    click() {
-        if (this.node.getChildByName('bottom_bubble').active) {
-            this.game.settleTip()
+    click(e) {
+        const data = {
+            type: e.target.type,
+            group: e.target.groupData,
+            item: e.target.infoData
         }
+        
+        this.game.canvas.getComponent('Canvas').newItemInfo(data)
     },
 
-    update(dt) {
-        this.node.zIndex = 1000 - this.node.y
+    init() {
 
-        this.top_food = this.node.getChildByName('top_food')
-
-        if (this.top_food.x < -this.game.canvas.width / 2 - this.node.x + this.top_food.width / 2) {
-            // 到边界了
-            this.top_food.getComponent(cc.Animation).stop()
-            this.top_food.active = false
-            this.top_food.setPosition(cc.v2(0, 100))
-        }
     },
 
+    // update (dt) {},
 });

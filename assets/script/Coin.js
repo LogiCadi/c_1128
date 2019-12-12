@@ -18,15 +18,22 @@ cc.Class({
 
     /**收集小鱼 */
     settle() {
-        let distance = this.dataStore.getDistance(this.game.coin_score, this.node)
-        // 动画
-        this.node.runAction(cc.sequence(cc.moveTo(200 / distance, cc.v2(this.game.coin_score.x, this.game.coin_score.y)), cc.callFunc(function () {
-            this.node.destroy()
-            this.game.coin_score.getComponent('CoinScore').addCoinScore(10)
-        }, this)))
+        let target = this.game.canvas.getChildByName('coin_score')
+        let distance = this.dataStore.getDistance(target, this.node)
+
+        for (const node of this.dataStore.coinPool[this.node.coinGroup]) {
+            // 动画
+            node.runAction(cc.sequence(cc.moveTo(distance / 1500, cc.v2(target.x, target.y)), cc.callFunc(function () {
+                this.game.coin += parseInt(node.count)
+                localStorage.setItem('coin', this.game.coin)
+                node.destroy()
+            }, this)))
+        }
+        this.dataStore.coinPool[this.node.coinGroup] = []
+
     },
 
     update(dt) {
-
+        // this.node.zIndex = 1000 - this.node.y
     },
 });

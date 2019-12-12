@@ -1,6 +1,6 @@
 {
   "__type__": "cc.AnimationClip",
-  "_name": "coinDrop",
+  "_name": "foodLeftJump",
   "_objFlags": 0,
   "_native": "",
   "_duration": 0.6666666666666666,
@@ -13,27 +13,26 @@
         {
           "frame": 0,
           "value": [
-            0,
-            0
+            3,
+            98
           ],
           "motionPath": [
             [
-              47.4,
-              24.7,
-              1.9,
-              21.5,
-              88.1,
-              24.6
+              -184,
+              221,
+              -70,
+              184,
+              -299,
+              258
             ]
           ]
         },
         {
           "frame": 0.6666666666666666,
           "value": [
-            99.6,
-            -16
-          ],
-          "motionPath": []
+            -741,
+            255
+          ]
         }
       ]
     }
