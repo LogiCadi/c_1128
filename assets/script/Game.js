@@ -79,14 +79,14 @@ cc.Class({
         // 初始化建筑
         this.buildAll()
 
-        this.getTip()
+        this.updateTip()
         this.schedule(function () {
-            this.getTip()
+            this.updateTip()
         }, 60)
     },
 
-    /**计算小费 */
-    getTip() {
+    /**小费 */
+    updateTip() {
         let total = 0
         // 统计所有设施每分钟增加小费的数额
         for (const key in this.dataStore.buildData) {
@@ -105,7 +105,7 @@ cc.Class({
         localStorage.setItem('tipCount', this.tipCount)
         localStorage.setItem('tipSettleTime', this.tipSettleTime)
     },
-    // 收集小费
+    // 收小费
     settleTip() {
         this.coin += this.tipCount
         this.game.canvas.getComponent('Canvas').newMsg('获得小费' + this.tipCount)
