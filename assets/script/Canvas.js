@@ -16,11 +16,17 @@ cc.Class({
 
     onLoad() {
         this.dataStore = cc.find('Game').getComponent('DataStore')
+        this.game = cc.find('Game').getComponent('Game')
+
+        // canvas=屏幕实际宽高
+        // this.node.width = cc.director.getWinSizeInPixels().width
+        // this.node.height = cc.director.getWinSizeInPixels().height
     },
 
     start() {
         this.modalList = []
     },
+
     newMsg(msg) {
         let modal = cc.instantiate(this.modal_msg)
         this.node.addChild(modal)

@@ -12,60 +12,82 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-       
+
     },
 
     // LIFE-CYCLE CALLBACKS:
 
-    onLoad () {
+    onLoad() {
         this.registerTouch()
+        this.game = cc.find('Game').getComponent('Game')
     },
 
-    start () {
+    start() {
+        this.mapScene = 'canting'
 
+        // this.node.getChildByName('canting').width = this.game.canvas.width
+        // this.node.getChildByName('canting').height = this.game.canvas.height
     },
 
     /**监听滑动事件切换页面 */
     registerTouch() {
-        this.node.on(cc.Node.EventType.TOUCH_MOVE, function (e) {
-            let x = e.getLocation().x - e.getPreviousLocation().x
-            // map移动
-            this.node.runAction(cc.moveBy(0, cc.v2(x, 0)))
 
+        this.node.on(cc.Node.EventType.TOUCH_START, function (e) {
+            // 触摸起始点
+            this.start = {
+                x: e.getLocation().x,
+                y: e.getLocation().y
+            }
+            // 移动方向
+            this.direction = ''
         }, this, true)
 
-        let startX
-        this.node.on(cc.Node.EventType.TOUCH_START, function (e) {
-            startX = e.getLocation().x
+        this.node.on(cc.Node.EventType.TOUCH_MOVE, function (e) {
+            let x = e.getLocation().x - e.getPreviousLocation().x
+
+            // map移动
+            this.node.runAction(cc.moveBy(0, cc.v2(x, 0)))
         }, this, true)
 
         this.node.on(cc.Node.EventType.TOUCH_END, function (e) {
 
-            let x = e.getLocation().x - startX
+            let x = e.getLocation().x - this.start.x
             this.node.stopAllActions()
 
             if (x < 0) {
                 // map移动
-                this.node.runAction(cc.moveTo(0.3, cc.v2(-360, 0)).easing(cc.easeExponentialOut()))
-            } else {
+                this.node.runAction(cc.moveTo(0.3, cc.v2(-this.game.canvas.width / 2, 0)).easing(cc.easeExponentialOut()))
+
+            } else if (x > 0) {
                 // map移动
-                this.node.runAction(cc.moveTo(0.3, cc.v2(360, 0)).easing(cc.easeExponentialOut()))
+                this.node.runAction(cc.moveTo(0.3, cc.v2(this.game.canvas.width / 2, 0)).easing(cc.easeExponentialOut()))
             }
         }, this, true)
+
         this.node.on(cc.Node.EventType.TOUCH_CANCEL, function (e) {
 
-            let x = e.getLocation().x - startX
+            let x = e.getLocation().x - this.start.x
             this.node.stopAllActions()
 
             if (x < 0) {
                 // map移动
-                this.node.runAction(cc.moveTo(0.3, cc.v2(-360, 0)).easing(cc.easeExponentialOut()))
-            } else {
+                this.node.runAction(cc.moveTo(0.3, cc.v2(-this.game.canvas.width / 2, 0)).easing(cc.easeExponentialOut()))
+            } else if (x > 0) {
                 // map移动
-                this.node.runAction(cc.moveTo(0.3, cc.v2(360, 0)).easing(cc.easeExponentialOut()))
+                this.node.runAction(cc.moveTo(0.3, cc.v2(this.game.canvas.width / 2, 0)).easing(cc.easeExponentialOut()))
             }
         }, this, true)
     },
 
-    // update (dt) {},
+    mapChange(map) {
+        if (map == 'canting') {
+            this.node.runAction(cc.moveTo(0.3, cc.v2(this.game.canvas.width / 2, 0)).easing(cc.easeExponentialOut()))
+        } else if (map == 'chufang') {
+            this.node.runAction(cc.moveTo(0.3, cc.v2(-this.game.canvas.width / 2, 0)).easing(cc.easeExponentialOut()))
+        }
+    },
+
+    update(dt) {
+
+    },
 });

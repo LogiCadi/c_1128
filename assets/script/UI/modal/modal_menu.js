@@ -64,6 +64,16 @@ cc.Class({
         this.init(c)
     },
 
+    bottomClick(e, c) {
+        let scrollView = this.node.getChildByName('wrap').getChildByName('scroll_view').getComponent(cc.ScrollView)
+        scrollView.stopAutoScroll()// 先停止自动滚动
+        if (c == 'canting') {
+            scrollView.scrollToOffset(cc.v2(0, 0))
+        } else if (c == 'chufang') {
+            scrollView.scrollToOffset(cc.v2(0, 1950))
+        }
+    },
+
     loadData() {
         // 加载列表group
         for (let index = 0; index < 5; index++) {

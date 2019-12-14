@@ -270,7 +270,7 @@ cc.Class({
         // this.dataStore.peoplePosition[pathList[pathList.length - 1].x + '-' + pathList[pathList.length - 1].y] = true
 
         let moveActionList = []
-        let speed = 100 // 速度
+        let speed = 80 // 速度
         let distance
         for (let i = 0; i < pathList.length; i++) {
             if (i != 0 && (pathList[i].x == pathList[i - 1].x || pathList[i].y == pathList[i - 1].y)) {
@@ -367,37 +367,6 @@ cc.Class({
             }
 
         }
-
-        // this.scheduleOnce(function () {
-        //     // 在桌子上显示食物
-        //     this.table.current.node.getChildByName('food').active = true
-
-        //     this.scheduleOnce(function () {
-        //         // 掉小鱼
-        //         this.game.dropCoin(this.node.x, this.node.y)
-
-        //         this.scheduleOnce(function () {
-        //             // 吃完le 
-        //             this.table.current.node.getChildByName('food').active = false
-        //             this.table.data.curPeople = false
-
-
-        //             let barList = this.dataStore.getBar()
-        //             if (barList.length > 0) {
-        //                 this.goBar(barList, 0, () => {
-        //                     this.moveTo(200, 600, () => {
-        //                         this.node.destroy()
-        //                     })
-        //                 })
-        //             } else {
-        //                 this.moveTo(200, 600, () => {
-        //                     this.node.destroy()
-        //                 })
-        //             }
-
-        //         }, 3)
-        //     }, 3)
-        // }, 3)
 
     },
     // 离开

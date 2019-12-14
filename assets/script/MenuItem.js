@@ -31,6 +31,14 @@ cc.Class({
         if (this.node.getChildByName('bottom_bubble').active) {
             this.game.settleTip()
         }
+
+        if (this.node.dirty) {
+            // 桌子上有脏盘
+            // 收回脏盘
+            this.node.getChildByName('food').active = false
+            this.game.cd_dirty += this.node.dirty
+            this.node.dirty = 0
+        }
     },
 
     update(dt) {

@@ -20,7 +20,9 @@ cc.Class({
         this.imageList = {}
         // 烹饪队列
         this.cookingQueue = []
-
+        // 上菜队列
+        this.cdQueue = []
+        // 金币分组池
         this.coinPool = {}
 
         // 客人的位置
@@ -56,7 +58,7 @@ cc.Class({
                         y: 400
                     },
                     "data": { // 特殊的参数
-                      
+
                     },
                     "itemList": {
                         "1010101": {
@@ -269,7 +271,7 @@ cc.Class({
                     },
                     "position": {
                         x: -200,
-                        y: -500
+                        y: -400
                     },
                     "data": {
 
@@ -529,7 +531,7 @@ cc.Class({
                     },
                     "position": {
                         x: 0,
-                        y: -500
+                        y: -400
                     },
                     "data": {
 
@@ -572,7 +574,7 @@ cc.Class({
                     },
                     "position": {
                         x: 200,
-                        y: -500
+                        y: -400
                     },
                     "data": {
 
@@ -728,6 +730,88 @@ cc.Class({
                         },
                     }
                 },
+                "117": {
+                    "id": "117",
+                    'scene': "chufang",
+                    "type": "环境",
+                    "title": "环境1",
+                    "current": {
+                        "itemId": "",
+                        "node": null
+                    },
+                    "position": {
+                        x: -200,
+                        y: -400
+                    },
+                    "data": {
+
+                    },
+                    "itemList": {
+                        "2020101": {
+                            "ID": "2020101",
+                            "名称": "环境1-1",
+                            "提升星级": "4",
+                            "提升上限": "",
+                            "提升烹饪效率（%）": "",
+                            "增加小费": "4",
+                            "解锁条件（星级）": "",
+                            "解锁条件（事件）": "",
+                            "价格（万）": "200"
+                        },
+                        "2020102": {
+                            "ID": "2020102",
+                            "名称": "环境1-2",
+                            "提升星级": "8",
+                            "提升上限": "",
+                            "提升烹饪效率（%）": "5",
+                            "增加小费": "6",
+                            "解锁条件（星级）": "140",
+                            "解锁条件（事件）": "",
+                            "价格（万）": "1000"
+                        },
+                    }
+                },
+                "118": {
+                    "id": "118",
+                    'scene': "chufang",
+                    "type": "环境",
+                    "title": "环境2",
+                    "current": {
+                        "itemId": "",
+                        "node": null
+                    },
+                    "position": {
+                        x: 0,
+                        y: -400
+                    },
+                    "data": {
+
+                    },
+                    "itemList": {
+                        "2020101": {
+                            "ID": "2020101",
+                            "名称": "环境1-1",
+                            "提升星级": "4",
+                            "提升上限": "",
+                            "提升烹饪效率（%）": "",
+                            "增加小费": "4",
+                            "解锁条件（星级）": "",
+                            "解锁条件（事件）": "",
+                            "价格（万）": "200"
+                        },
+                        "2020102": {
+                            "ID": "2020102",
+                            "名称": "环境1-2",
+                            "提升星级": "8",
+                            "提升上限": "",
+                            "提升烹饪效率（%）": "5",
+                            "增加小费": "6",
+                            "解锁条件（星级）": "140",
+                            "解锁条件（事件）": "",
+                            "价格（万）": "1000"
+                        },
+                    }
+                },
             }
 
             localStorage.setItem('buildData', JSON.stringify(this.buildData))
@@ -854,6 +938,7 @@ cc.Class({
                     "基础烹饪时间（s）": "5",
                     "基础用餐时间（s）": "5",
                     "每卖出一份能收入": "60",
+                    "消耗餐盘": 1,
                     "解锁条件（星级）": "",
                     "解锁条件（事件）": "2010101",
                     "已解锁": false,
@@ -883,6 +968,8 @@ cc.Class({
                     "基础烹饪时间（s）": "8",
                     "基础用餐时间（s）": "6",
                     "每卖出一份能收入": "80",
+                    "消耗餐盘": 2,
+
                     "解锁条件（星级）": "10",
                     "解锁条件（事件）": "",
                     "价格（万）": "800"
@@ -896,6 +983,8 @@ cc.Class({
                     "名称": "C",
                     "基础烹饪时间（s）": "10",
                     "基础用餐时间（s）": "6",
+                    "消耗餐盘": 2,
+
                     "每卖出一份能收入": "120",
                     "解锁条件（星级）": "15",
                     "解锁条件（事件）": "",
@@ -910,6 +999,8 @@ cc.Class({
                     "名称": "D",
                     "基础烹饪时间（s）": "12",
                     "基础用餐时间（s）": "8",
+                    "消耗餐盘": 1,
+
                     "每卖出一份能收入": "150",
                     "解锁条件（星级）": "25",
                     "解锁条件（事件）": "",
@@ -924,6 +1015,7 @@ cc.Class({
                     "名称": "E",
                     "基础烹饪时间（s）": "15",
                     "基础用餐时间（s）": "10",
+                    "消耗餐盘": 2,
                     "每卖出一份能收入": "200",
                     "解锁条件（星级）": "50",
                     "解锁条件（事件）": "",
@@ -972,7 +1064,8 @@ cc.Class({
         let tableIDs = ["102", "103", "104", "107", "108", "109"]
 
         for (const id of tableIDs) {
-            if (this.buildData[id] && this.buildData[id]["current"]['node'] && !this.buildData[id].data.curPeople) {
+            if (this.buildData[id] && this.buildData[id]["current"]['node'] &&
+                !this.buildData[id].data.curPeople && !this.buildData[id]["current"]['node'].dirty) {
                 return this.buildData[id]
             }
         }
@@ -1056,67 +1149,97 @@ cc.Class({
     getPeopleFood(people) {
         return this.lottery(JSON.parse(people['点菜需求']))
     },
+
+    /**检查空盘 上菜 */
+    cdCheck() {
+        if (this.cdQueue.length == 0) return
+        for (const key in this.cdQueue) {
+            const cookingData = this.cdQueue[key]
+
+            if (this.game.cd_clean >= this.dish[cookingData['dish']['id']]['消耗餐盘']) {
+                // 消耗餐盘
+                this.game.cd_clean -= this.dish[cookingData['dish']['id']]['消耗餐盘']
+
+                this.cdQueue.splice(key, 1)
+
+                let bench = cookingData.bench
+                console.log(cookingData)
+                // 食物飞 的动画
+                bench.current.node.getChildByName('top_food').getComponent(cc.Animation).play()
+                let onStop = function () {
+                    bench.current.node.getChildByName('top_food').getComponent(cc.Animation).off('stop', onStop, this)
+                    this.scheduleOnce(function () {
+                        // 灶台又变回空闲状态
+                        bench['data']['isCooking'] = false
+
+                        // 桌上放好食物
+                        this.buildData[cookingData['table']['id']].current.node.getChildByName('food').active = true
+                        this.buildData[cookingData['table']['id']].current.node.getChildByName('food').getComponent(cc.Sprite).spriteFrame = this.imageList[cookingData['dish']['id']]
+                        // 标记正在吃
+                        // this.buildData[cookingData['table']['id']].current.node.eating = true
+
+                        // 进食时间
+                        // 基础用餐时间（s） * (1- 提升用餐效率（%）)
+                        let eatingTime = parseInt(this.dish[cookingData['dish']['id']]['基础用餐时间（s）'])
+                        if (this.buildData[cookingData.table.id]["提升用餐效率（%）"]) {
+                            eatingTime *= (1 - parseInt(this.buildData[cookingData.table.id]["提升用餐效率（%）"]))
+                        }
+
+                        this.scheduleOnce(function () {
+                            // 标记已经吃完
+                            // 食物变成脏盘
+                            if (this.dish[cookingData.dish.id]['消耗餐盘']) {
+                                this.buildData[cookingData['table']['id']].current.node.getChildByName('food').getComponent(cc.Sprite).spriteFrame = this.imageList['1010102']
+                                this.buildData[cookingData['table']['id']].current.node.dirty = this.dish[cookingData.dish.id]['消耗餐盘']
+                            }
+                            // 改变用户目标，让他离开桌子
+                            this.buildData[cookingData['table']['id']].data['curPeople'].target = 'bar'
+
+                        }, eatingTime)
+                    }, 0.5)
+                }
+                bench.current.node.getChildByName('top_food').getComponent(cc.Animation).on('stop', onStop, this)
+            }
+        }
+    },
     // 烹饪
     setCooking() {
-        if (this.cookingQueue.length > 0) {
-            // 找空灶台
-            let cookingBenchIDs = ["114", "115", "116"]
-            for (const index of cookingBenchIDs) {
-                // 灶台
-                let bench = this.buildData[index]
-                if (bench.current.itemId && !bench['data']['isCooking']) {
-                    // 灶台是空闲的
-                    let cookingData = this.cookingQueue.shift()
-                    bench['data']['isCooking'] = true
+        // cookingQueue里保存的是桌子和菜品的信息队列
+        // 每次取出一条烹饪
+        if (this.cookingQueue.length == 0) return
+        // 找空灶台
+        let cookingBenchIDs = ["114", "115", "116"]
+        for (const index of cookingBenchIDs) {
+            // 灶台
+            let bench = this.buildData[index]
+            if (bench.current.itemId && !bench['data']['isCooking']) {
+                // 灶台是空闲的
+                let cookingData = this.cookingQueue.shift()
+                bench['data']['isCooking'] = true
 
-                    // 在灶台上显示食物
-                    bench.current.node.getChildByName('top_food').active = true
-                    bench.current.node.getChildByName('top_food').getComponent(cc.Sprite).spriteFrame = this.imageList[cookingData['dish']['id']]
+                // 在灶台上显示食物
+                bench.current.node.getChildByName('top_food').active = true
+                bench.current.node.getChildByName('top_food').getComponent(cc.Mask).spriteFrame = this.imageList[cookingData['dish']['id']]
+                bench.current.node.getChildByName('top_food').getChildByName('image').getComponent(cc.Sprite).spriteFrame = this.imageList[cookingData['dish']['id']]
+                bench.current.node.getChildByName('top_food').getChildByName('mask').y = 0
 
-                    // 烹饪时间 
-                    // 菜的烹饪时间 * （1 - 灶台提升%）
-                    let cookingTime = parseInt(this.dish[cookingData['dish']['id']]['基础烹饪时间（s）'])
-                    if (bench.itemList[bench.current.itemId]["提升烹饪效率（%）"]) {
-                        cookingTime *= (1 - parseInt(bench.itemList[bench.current.itemId]["提升烹饪效率（%）"]))
-                    }
-
-                    this.scheduleOnce(function () {
-                        // 食物做好了
-                        // 食物飞 的动画
-                        bench.current.node.getChildByName('top_food').getComponent(cc.Animation).play()
-                        let onStop = function () {
-                            bench.current.node.getChildByName('top_food').getComponent(cc.Animation).off('stop', onStop, this)
-                            this.scheduleOnce(function () {
-                                // 灶台又变回空闲状态
-                                bench['data']['isCooking'] = false
-
-                                // 桌上放好食物
-                                this.buildData[cookingData['table']['id']].current.node.getChildByName('food').active = true
-                                this.buildData[cookingData['table']['id']].current.node.getChildByName('food').getComponent(cc.Sprite).spriteFrame = this.imageList[cookingData['dish']['id']]
-                                // 标记正在吃
-                                // this.buildData[cookingData['table']['id']].current.node.eating = true
-
-                                // 进食时间
-                                // 基础用餐时间（s） * (1- 提升用餐效率（%）)
-                                let eatingTime = parseInt(this.dish[cookingData['dish']['id']]['基础用餐时间（s）'])
-                                if (this.buildData[cookingData.table.id]["提升用餐效率（%）"]) {
-                                    eatingTime *= (1 - parseInt(this.buildData[cookingData.table.id]["提升用餐效率（%）"]))
-                                }
-
-                                this.scheduleOnce(function () {
-                                    // 食物消失
-                                    // 标记已经吃完
-                                    this.buildData[cookingData['table']['id']].current.node.getChildByName('food').active = false
-                                    // 改变用户目标，让他离开桌子
-                                    this.buildData[cookingData['table']['id']].data['curPeople'].target = 'bar'
-
-                                }, eatingTime)
-                            }, 0.5)
-                        }
-                        bench.current.node.getChildByName('top_food').getComponent(cc.Animation).on('stop', onStop, this)
-                    }, cookingTime)
-                    break
+                // 烹饪时间 
+                // 菜的烹饪时间 * （1 - 灶台提升%）
+                let cookingTime = parseInt(this.dish[cookingData['dish']['id']]['基础烹饪时间（s）'])
+                if (bench.itemList[bench.current.itemId]["提升烹饪效率（%）"]) {
+                    cookingTime *= (1 - parseInt(bench.itemList[bench.current.itemId]["提升烹饪效率（%）"]))
                 }
+                // 烹饪过程
+                bench.current.node.getChildByName('top_food').getChildByName('mask').runAction(
+                    cc.moveTo(cookingTime, cc.v2(0, -bench.current.node.getChildByName('top_food').getChildByName('mask').height))
+                )
+
+                this.scheduleOnce(function () {
+                    // 食物做好了 放入准备上菜队列
+                    cookingData.bench = bench
+                    this.cdQueue.push(cookingData)
+                }, cookingTime)
+                break
             }
         }
     },
@@ -1158,6 +1281,7 @@ cc.Class({
             }
         } else {
             this.setCooking()
+            this.cdCheck()
         }
 
     },

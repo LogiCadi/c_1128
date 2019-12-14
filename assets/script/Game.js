@@ -76,6 +76,10 @@ cc.Class({
         // 小费结算时间
         this.tipSettleTime = parseInt(localStorage.getItem('tipSettleTime')) || Math.round(new Date().getTime() / 1000)
 
+        // 光盘
+        this.cd_clean = 5
+        this.cd_dirty = 0
+
         // 初始化建筑
         this.buildAll()
 
@@ -83,10 +87,36 @@ cc.Class({
         this.schedule(function () {
             this.updateTip()
         }, 60)
+
+        // this.request('http://122.51.165.27/test')
+    },
+
+    request(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+
+        xhr.onload = function (e) {
+            // 请求结束后,在此处写处理代码
+            console.log(e.target.response)
+        }
+
+        xhr.send();
+    },
+
+    /**洗碗 */
+    washCD() {
+        if (--this.cd_dirty >= 0) {
+            ++this.cd_clean
+        } else {
+            this.cd_dirty = 0
+        }
     },
 
     /**小费 */
     updateTip() {
+        let id = "101"
+        if (!this.dataStore.buildData[id].current.itemId) return
+
         let total = 0
         // 统计所有设施每分钟增加小费的数额
         for (const key in this.dataStore.buildData) {
@@ -100,6 +130,10 @@ cc.Class({
         let duration = Math.round(new Date().getTime() / 1000) - this.tipSettleTime
         // 储存在小费台
         this.tipCount += Math.round(duration * total / 60)
+        // 存储上限
+        let limit = parseInt(this.dataStore.buildData[id].itemList[this.dataStore.buildData[id].current.itemId]["提升上限"])
+        if (this.tipCount >= limit) this.tipCount = limit
+
         this.tipSettleTime = Math.round(new Date().getTime() / 1000)
 
         localStorage.setItem('tipCount', this.tipCount)
@@ -108,20 +142,23 @@ cc.Class({
     // 收小费
     settleTip() {
         this.coin += this.tipCount
+        localStorage.setItem('coin', this.coin)
         this.game.canvas.getComponent('Canvas').newMsg('获得小费' + this.tipCount)
         this.tipCount = 0
+        localStorage.setItem('tipCount', this.tipCount)
     },
+    // 初始化所有建筑
     buildAll() {
         for (const key in this.dataStore.buildData) {
             const ele = this.dataStore.buildData[key]
 
             if (ele.current.itemId) {
                 let item = ele.itemList[ele.current.itemId]
-                this.build(ele, item)
+                this.build(ele, item, true)
             }
         }
     },
-
+    // 来客人进度
     newPeopleProgress() {
         this.newPeoplePercent += this.newPeopleStep
         if (this.newPeoplePercent >= 1) {
@@ -202,31 +239,55 @@ cc.Class({
             this.dataStore.buildData["101"].current.node.getChildByName('bottom_bubble').active = this.tipCount
             this.dataStore.buildData["101"].current.node.getChildByName('bottom_bubble').getChildByName('label').getComponent(cc.Label).string = this.tipCount
         }
+
+        // 光盘
+        cc.find('Canvas/wash_cd/Background/Label').getComponent(cc.Label).string = `洗盘\n空盘x${this.cd_clean}\n脏盘x${this.cd_dirty}`
     },
 
     /**建造设施 */
-    build(group, item) {
-        cc.loader.loadRes('image/' + item["ID"], cc.SpriteFrame, (err, spriteFrame) => {
-            let thisNode = this.dataStore.buildData[group["id"]].current.node
-            if (!thisNode) {
-                // 新增
-                thisNode = cc.instantiate(this.menu_item)
+    build(group, item, init = false) {
+        let buildMethod = () => {
+            cc.loader.loadRes('image/' + item["ID"], cc.SpriteFrame, (err, spriteFrame) => {
+                let thisNode = this.dataStore.buildData[group["id"]].current.node
+                if (!thisNode) {
+                    // 新增
+                    thisNode = cc.instantiate(this.menu_item)
 
-                let scene = this.map.getChildByName(group.scene)
-                scene.addChild(thisNode)
-                thisNode.setPosition(cc.v2(group["position"].x, group["position"].y))
-                this.dataStore.buildData[group["id"]].current.node = thisNode
-                // 障碍物
-                this.dataStore.barrier.push(thisNode)
-            }
+                    let scene = this.map.getChildByName(group.scene)
+                    scene.addChild(thisNode)
+                    thisNode.setPosition(cc.v2(group["position"].x, group["position"].y))
+                    this.dataStore.buildData[group["id"]].current.node = thisNode
+                    // 障碍物
+                    this.dataStore.barrier.push(thisNode)
 
-            thisNode.getComponent(cc.Sprite).spriteFrame = spriteFrame
-            this.dataStore.buildData[group["id"]].current.itemId = item['ID']
-            this.dataStore.buildData[group["id"]]['itemList'][item["ID"]]["已购买"] = true
+                    if (!init) {
+                        // 亮光
+                        thisNode.getChildByName('main').getChildByName('mask').runAction(cc.moveTo(1, cc.v2(92, 0)))
+                    }
+                }
+                thisNode.getChildByName('main').getComponent(cc.Mask).spriteFrame = spriteFrame
+                thisNode.getChildByName('main').getChildByName('image').getComponent(cc.Sprite).spriteFrame = spriteFrame
 
-            // 保存到storage
-            let buildData = this.dataStore.Clone(this.dataStore.buildData)
-            localStorage.setItem('buildData', JSON.stringify(buildData))
-        })
+                this.dataStore.buildData[group["id"]].current.itemId = item['ID']
+                this.dataStore.buildData[group["id"]]['itemList'][item["ID"]]["已购买"] = true
+
+                // 保存到storage
+                let buildData = this.dataStore.Clone(this.dataStore.buildData)
+                localStorage.setItem('buildData', JSON.stringify(buildData))
+            })
+        }
+
+        if (!init) {
+            // 不是初始化操作
+            // 跳转场景
+            this.map.getComponent('Map').mapChange(group['scene'])
+            this.scheduleOnce(function () {
+                // 稍微延迟建筑
+                buildMethod(init)
+            }, 0.5)
+        } else {
+            // 初始化直接建造
+            buildMethod(init)
+        }
     }
 });
